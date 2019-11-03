@@ -1,0 +1,201 @@
+$tomato:#EE483E;
+html{
+    height: 100%;
+}
+body{
+    min-height: 100%;
+    background: #EEEAE3;
+    font-family: 'Open Sans', sans-serif;
+    color: #000;
+    
+}
+.trans{
+    transition: all 1s;
+}
+.form-control:focus {
+    border-color: #ced4da; 
+    box-shadow: none; 
+}
+.form-check-input {
+    margin-top: 0;
+}
+::placeholder {
+  font-size: 13px;
+}
+
+.completed{
+    text-decoration: line-through;
+}
+.list-group-item.active {
+    color: #000;
+    background-color: rgba(0,0,0,0.05);
+    border-color:  rgba(0,0,0,0.05);
+}
+.cursor{
+    cursor: pointer;
+}
+.circle{
+    width: 300px;
+    height: 300px;
+    border:40px solid lightcoral;
+    background: rgba(255,255,255,0.3);
+    
+}
+.time{
+    color: salmon;
+    font-weight: 600;
+    letter-spacing: 5px;
+}
+.col-2{
+    max-width: 8%;
+}
+.min-vh-100{
+    min-height: 100vh;
+}
+.nav{
+ position: relative;
+}
+.nav-list{
+    position: absolute;
+    right: 10px;
+    top: 50px;
+}
+.nav-content{
+    width: 85%;
+    padding: 0 40px;
+    & > div {
+        padding-top: 50px;
+    }
+}
+.nav-link{
+    font-size: 30px;
+    color: #000;
+   
+}
+.nav-link:focus, .nav-link:hover {
+    color: #EE8E5A;
+}
+.transformX{
+    transform: translateX(-200%); 
+}
+.nav-expand{
+    width: 70px;
+    height: 40px;
+    font-size: 23px;
+    line-height: 40px;
+    background-color: #fff;
+    position: absolute;
+    bottom: 100px;
+    right: -10px;
+    border-radius: 10px 20px 20px 10px;
+    box-shadow: 1px 1px 5px #888888;
+    cursor: pointer;
+}
+.taskname{
+    color:slategray;
+}
+.text-orange{
+    color: $tomato;
+}
+.todo-icon{
+    cursor: pointer;
+}
+.icon{
+    width: 50px;
+    height: 50px;
+    background-color: #fff;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 50px;
+    margin:0 35px ;
+    cursor: pointer;
+    &:hover{
+        font-size: 20px;
+    }
+}
+.icon-orange-active{
+    background: #EE483E;
+    color: white;
+    box-shadow: 1px 1px 30px rgb(255, 255, 255);
+}
+.icon-gray-active{
+    background: #6c757d;
+    color: white !important;
+    box-shadow: 1px 1px 30px rgb(255, 255, 255);
+}
+
+
+//checkbox style
+.ani-checkbox{
+    label {
+    display: inline-block; // to make it easier to click
+    color: black;
+    cursor: pointer;
+    position: relative; // important
+    font-size: 14px;
+    // Now we'll create the checkbox object
+  
+    span {
+      display: inline-block;
+      position: relative;
+      background-color: transparent;
+      width: 25px;
+      height: 25px;
+      transform-origin: center;
+      border: 2px solid $tomato;
+      border-radius: 50%;
+      vertical-align: -6px;
+      margin-right: 10px;
+      transition: background-color 150ms 200ms, transform 350ms cubic-bezier(.78,-1.22,.17,1.89); // custom ease effect for bouncy animation
+  
+  // Now we'll create the "tick" using pseudo elements - those will be basically two lines that will be rotated to form the "tick"
+  
+    &:before {
+      content: "";
+      width: 0px;
+      height: 2px;
+      border-radius: 2px; // so that the tick has nice rounded look
+      background: $tomato;
+      position: absolute;
+      transform: rotate(45deg);
+      top: 10px; // you'll need to experiment with placement depending on the dimensions you've chosen
+      left: 7px; // you'll need to experiment with placement depending on the dimensions you've chosen
+      transition: width 50ms ease 50ms;
+      transform-origin: 0% 0%;
+    }
+  
+    &:after {
+      content: "";
+      width: 0;
+      height: 2px;
+      border-radius: 2px; // so that the tick has nice rounded look
+      background: $tomato;
+      position: absolute;
+      transform: rotate(305deg);
+      top: 13px; // you'll need to experiment with placement depending on the dimensions you've chosen
+      left: 8px; // you'll need to experiment with placement depending on the dimensions you've chosen
+      transition: width 50ms ease;
+      transform-origin: 0% 0%;
+    }
+  }
+  // Time to add some life to it
+  
+  &:hover {
+    span {
+      &:before {
+        width: 5px;
+        transition: width 100ms ease;
+      }
+      
+      &:after {
+        width: 10px;
+        transition: width 150ms ease 100ms;
+      }
+    }
+  }
+    }
+
+    input[type="checkbox"] {
+        display: none; // hide the system checkbox
+    } 
+}

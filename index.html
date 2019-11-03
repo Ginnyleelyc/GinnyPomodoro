@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-hant-TW">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>POMODORO</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+    integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
+  <link rel="stylesheet" href="css/jQuery.countdownTimer.css">
+  <link rel="stylesheet" href="css/all.css">
+
+</head>
+
+<body>
+  <div id="app">
+    <div class="container-fluid p-0">
+      <div class="row">
+        <div class="trans" :class="[navshow? 'col-6':'col-2']">
+          <div class="nav bg-white  min-vh-100 d-flex ">
+            <div class="nav-content border-right trans" :class="{'transformX': !navshow}">
+              <div id="add" v-if="active == 'add'">
+                <h3 class="border-bottom pb-2 mb-5 h4">ADD NEW TASK</h3>
+                <div class="input-group mb-5 ">
+                  <input type="text" class="form-control" placeholder="ADD A NEW MISSION..." v-model="newText" @keyup.enter="addTodo">
+                  <div class="input-group-append w-25">
+                    <input type="text" id="datepicker" class="form-control bg-white" placeholder="日期"  v-model="date" autocomplete="off">
+                  </div>
+                </div>
+                <button type="button" class="btn btn-danger btn-block rounded-pill" @click="addTodo">新增</button>
+                <div id="todolist" class="list mt-5">
+                  <div class="list-header d-flex bg-light p-3 rounded">
+                    <h3>TO-DO</h3>
+                    <div class="ml-auto">
+                      <span class="badge badge-danger mr-2">{{uncompletedLen}}</span>
+                      <span class="cursor" @click="todoshow = !todoshow"><i class="fas"
+                          :class="[todoshow?'fa-caret-up':'fa-caret-down']"></i></span>
+                    </div>
+                  </div>
+                  <div class="list-body" v-if="todoshow ">
+                    <ul class="list-group list-group-flush text-left">
+                      <li class="list-group-item" :key="item.id" v-for="(item,index) in filteredTodoIng" 
+                      :class="{'active':item.id == taskitem.id}" @dblclick="editTodo(item)" @click="choseTask(item)">
+                        <div class="d-flex align-items-center" v-if="cacheTodo.id !== item.id">
+                          <div>
+                            {{item.title}}
+                          </div>
+                          <div class="ml-auto d-flex align-items-center">
+                            <span class="mr-2">{{item.date}}</span>
+                            <button type="button" class="close"  @click.stop="delectTodo(item)">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                        </div>
+                        <input type="text" class="form-control" v-model="cacheTitle" @keyup.enter="doneTodo(item)"
+                          @keyup.esc="cancelEdit" @blur="cancelEdit" v-if="cacheTodo.id == item.id">
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                
+              </div>
+              <div id="alllist" v-if="active == 'alllist'">
+                <h3 class="border-bottom pb-2 mb-5 h4">TO-DO LIST</h3>
+                <div id="todolist" class="list mt-5">
+                  <div class="list-header d-flex bg-light p-3 rounded">
+                    <h3>TO-DO</h3>
+                    <div class="ml-auto">
+                      <span class="badge badge-danger mr-2">{{uncompletedLen}}</span>
+                      <span class="cursor" @click="todoshow = !todoshow"><i class="fas"
+                          :class="[todoshow?'fa-caret-up':'fa-caret-down']"></i></span>
+                    </div>
+                  </div>
+                  <div class="list-body" v-if="todoshow ">
+                    <ul class="list-group list-group-flush text-left">
+                      <li class="list-group-item" :key="item.id" v-for="(item,index) in filteredTodoIng" 
+                      :class="{'active':item.id == taskitem.id}" @dblclick="editTodo(item)" @click="choseTask(item)">
+                        <div class="d-flex" v-if="cacheTodo.id !== item.id">
+                          <div class="form-check li-text" :class="{'completed': item.completed}">
+                            <input type="checkbox" class="form-check-input" :id="item.id" v-model="item.completed" @click="refreshTimer">
+                            <label class="form-check-label" :for="item.id">
+                              {{item.title}}
+                            </label>
+                          </div>
+                          <div class="ml-auto li-text">
+                            <span class="mr-2">{{item.date}}</span>
+                            <button type="button" class="close" aria-label="Close" @click.stop="delectTodo(item)">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                        </div>
+                        <input type="text" class="form-control" v-model="cacheTitle" @keyup.enter="doneTodo(item)"
+                          @keyup.esc="cancelEdit" @blur="cancelEdit" v-if="cacheTodo.id == item.id">
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div id="donelist" class="list my-5">
+                  <div class="list-header d-flex bg-light p-3 rounded">
+                    <h3>Done</h3>
+                    <span class="ml-auto cursor" @click="doneshow = !doneshow"><i class="fas"
+                        :class="[doneshow?'fa-caret-up':'fa-caret-down']"></i></span>
+                  </div>
+                  <div class="list-body" v-if="doneshow">
+                    <ul class="list-group list-group-flush text-left" name="drog">
+                      <li class="list-group-item" v-for="(item,index) in filteredTodoDone" @dblclick="editTodo(item)">
+                        <div class="d-flex" v-if="cacheTodo.id !== item.id">
+                          <div class="form-check li-text" :class="{'completed': item.completed}">
+                            <input type="checkbox" class="form-check-input" :id="item.id" v-model="item.completed" disabled>
+                            <label class="form-check-label" :for="item.id">
+                              {{item.title}}
+                            </label>
+                          </div>
+                          <div class="ml-auto li-text">
+                            <span class="mr-2">{{item.date}}</span>
+                            <button type="button" class="close" aria-label="Close" @click.stop="delectTodo(item)">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                        </div>
+                        <input type="text" class="form-control" v-model="cacheTitle" @keyup.enter="doneTodo(item)"
+                          @keyup.esc="cancelEdit" @blur="cancelEdit" v-if="cacheTodo.id == item.id">
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="d-flex justify-content-center pt-5">
+                  <button type="button" class="btn btn-outline-dark btn-sm" @click="reset">清除所有</button>
+                </div>
+              </div>
+              <!-- <div id="report" v-if="active == 'report'">
+                <h3 class="border-bottom pb-2 mb-5 h4">Analysis</h3>
+              </div>
+              <div id="music" v-if="active == 'music'">
+                <h3 class="border-bottom pb-2 mb-5 h4">Change Music</h3>
+              </div> -->
+            </div>
+            <nav class="nav-list flex-column  ">
+              <a class="nav-link text-orange mb-5" href="#" @click.prevent="active = 'add'" @click="navshow = 'true'"><i class="fas fa-plus-circle"></i></a>
+              <a class="nav-link mb-5" href="#" @click.prevent="active = 'alllist'" @click="navshow = true"><i class="fas fa-bars"></i></a>
+              <!-- <a class="nav-link mb-5" href="#" @click.prevent="active = 'report'" @click="navshow = true"><i class="far fa-chart-bar"></i></a>
+              <a class="nav-link mb-5" href="#" @click.prevent="active = 'music'" @click="navshow = true"><i class="fas fa-music"></i></a> -->
+            </nav>
+            <div class="nav-expand text-center" @click="navshow = !navshow">
+              <i class="fas mr-2" :class="[navshow? 'fa-arrow-left':'fa-arrow-right']"></i><i class="far text-orange" :class="[navshow? 'fa-laugh-squint':'fa-smile']"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="trans" :class="[navshow? 'col-6':'col-10']">
+          <div class="min-vh-100 d-flex flex-column align-items-center justify-content-center">
+            <h2 class="text-center h2 mb-5 taskname" v-if="taskitem.title">{{ taskitem.title }}</h2>
+            <h2 class="text-center h2 mb-5 taskname" v-else>Add New Task!!!</h2>
+            <div class="rounded-circle circle d-flex flex-column align-items-center justify-content-center mb-5">
+              <div class="display-4 time ">{{minutes}}:{{(seconds).toString().length === 1 ? '0' + seconds : seconds}}</div>
+            </div>
+            <ul class="d-flex control">
+              <li class="icon start text-orange trans" data-num="0" @click="startTimer"><i class="fas fa-play"></i></li>
+              <li class="icon pause text-secondary trans" @click="pauseTimer"><i class="fas fa-pause"></i></li>
+              <li class="icon refresh text-secondary trans" @click="refreshTimer"><i class="fas fa-undo"></i></li>
+            </ul>
+            <div v-if="taskitem.title" class="mt-5 ani-checkbox">
+              <input type="checkbox" :id="taskitem.id" @click="refreshTimer(); taskitem.completed = true">
+              <label :for="taskitem.id">
+                <span></span>TASK COMPLETED
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+   
+    
+  </div>
+
+
+
+
+
+
+
+
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script src="js/jQuery.countdownTimer.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="js/all.js"></script>
+</body>
+
+</html>
